@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Core\AbstractEntity;
-use DateTimeInterface;
 
 class Commande extends AbstractEntity
 {
@@ -14,7 +13,7 @@ class Commande extends AbstractEntity
         float $prixFinal,
         bool $reductionAppliquee = false,
         ?int $id = null,
-        ?DateTimeInterface $dateCreation = null
+        ?\DateTimeInterface $dateCreation = null
     ) {
         parent::__construct($id, $dateCreation);
         $this->prixFinal = $prixFinal;

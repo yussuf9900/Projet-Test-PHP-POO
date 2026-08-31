@@ -2,18 +2,15 @@
 
 namespace App\Core;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-
 abstract class AbstractEntity
 {
     protected ?int $id;
-    protected ?DateTimeInterface $dateCreation;
+    protected ?\DateTimeInterface $dateCreation;
 
-    public function __construct(?int $id = null, ?DateTimeInterface $dateCreation = null)
+    public function __construct(?int $id = null, ?\DateTimeInterface $dateCreation = null)
     {
         $this->id = $id;
-        $this->dateCreation = $dateCreation ?? new DateTimeImmutable();
+        $this->dateCreation = $dateCreation ?? new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -26,12 +23,12 @@ abstract class AbstractEntity
         $this->id = $id;
     }
 
-    public function getDateCreation(): ?DateTimeInterface
+    public function getDateCreation(): ?\DateTimeInterface
     {
         return $this->dateCreation;
     }
 
-    public function setDateCreation(DateTimeInterface $dateCreation): void
+    public function setDateCreation(\DateTimeInterface $dateCreation): void
     {
         $this->dateCreation = $dateCreation;
     }
