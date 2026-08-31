@@ -1,0 +1,19 @@
+{
+    "name": "ichigo/exo4",
+    "autoload": {
+        "psr-4": {
+            "App\\Core\\": "src/Core/",
+            "App\\Http\\": "src/controller/",
+            "App\\Entity\\": "src/Entity/",
+            "App\\Model\\": "src/Repository/",
+            "App\\Service\\": "src/Service/"
+        }
+    },
+    "authors": [
+        {
+            "name": "yussuf9900",
+            "email": "yussuf9900@gmail.com"
+        }
+    ],
+    "require": {}
+}
