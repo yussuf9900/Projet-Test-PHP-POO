@@ -2,24 +2,24 @@
 
 namespace App\DTO;
 
-class CommandeDTO
+readonly class CommandeDTO
 {
-    private array $panier;
-    private ?string $codePromo;
+    private float $prixFinal;
+    private bool $reductionAppliquee;
 
-    public function __construct(array $panier = [], ?string $codePromo = null)
+    public function __construct(float $prixFinal, bool $reductionAppliquee = false)
     {
-        $this->panier = $panier;
-        $this->codePromo = $codePromo;
+        $this->prixFinal = $prixFinal;
+        $this->reductionAppliquee = $reductionAppliquee;
     }
 
-    public function getPanier(): array
+    public function getPrixFinal(): float
     {
-        return $this->panier;
+        return $this->prixFinal;
     }
 
-    public function getCodePromo(): ?string
+    public function isReductionAppliquee(): bool
     {
-        return $this->codePromo;
+        return $this->reductionAppliquee;
     }
 }

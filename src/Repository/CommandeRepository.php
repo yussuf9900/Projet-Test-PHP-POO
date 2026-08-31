@@ -2,29 +2,17 @@
 
 namespace App\Repository;
 
+use App\Core\Database;
 use App\Entity\Commande;
 
 class CommandeRepository
 {
     private \PDO $pdo;
 
-    public function __construct(?\PDO $pdo = null)
+    public function __construct(?Database $database = null)
     {
-        if ($pdo !== null) {
-            $this->pdo = $pdo;
-        } else {
-            $host ='localhost';
-            $port = '5433';
-            $dbname = 'ecommercegestion';
-            $user = 'ichigo';
-            $password = 'password';
-
-            $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
-            $this->pdo = new \PDO($dsn, $user, $password, [
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-            ]);
-        }
+        $db = $database ?? new Database();
+        $this->pdo = $db->getPdo();
     }
 
     public function save(Commande $commande): bool
@@ -56,17 +44,7 @@ class CommandeRepository
         $stmt->execute();
         $data = $stmt->fetch(\PDO::FETCH_ASSOC);
 
-        if (!$data) {
-            return null;
-        }
-
-        $dateCreation = isset($data['date_creation']) ? new \DateTimeImmutable($data['date_creation']) : null;
-        return new Commande(
-            (float) $data['prix_final'],
-            (bool) $data['reduction_appliquee'],
-            (int) $data['id'],
-            $dateCreation
-        );
+        return $data ? $this->hydrate($data) : null;
     }
 
     public function findAll(): array
@@ -76,15 +54,21 @@ class CommandeRepository
         $commandes = [];
 
         foreach ($rows as $data) {
-            $dateCreation = isset($data['date_creation']) ? new \DateTimeImmutable($data['date_creation']) : null;
-            $commandes[] = new Commande(
-                (float) $data['prix_final'],
-                (bool) $data['reduction_appliquee'],
-                (int) $data['id'],
-                $dateCreation
-            );
+            $commandes[] = $this->hydrate($data);
         }
 
         return $commandes;
+    }
+
+    private function hydrate(array $data): Commande
+    {
+        $dateCreation = isset($data['date_creation']) ? new \DateTimeImmutable($data['date_creation']) : null;
+
+        return new Commande(
+            (float) $data['prix_final'],
+            (bool) $data['reduction_appliquee'],
+            (int) $data['id'],
+            $dateCreation
+        );
     }
 }

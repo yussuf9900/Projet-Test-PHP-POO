@@ -2,60 +2,39 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
+use App\Core\Database;
 use App\DTO\CommandeDTO;
 use App\Entity\Commande;
 use App\Repository\CommandeRepository;
 
-
 $donneesClient = [
-    'panier' => [
-        ['id' => 1, 'nom' => 'Clavier mécanique', 'prix' => 7500, 'quantite' => 1],
-        ['id' => 2, 'nom' => 'Souris sans fil', 'prix' => 2500, 'quantite' => 2],
-    ],
-    'code_promo' => 'REDUC10'
+    'prix_final' => 15000.0,
+    'reduction_appliquee' => true,
 ];
 
-$commandeDTO = new CommandeDTO($donneesClient['panier'], $donneesClient['code_promo']);
+$commandeDTO = new CommandeDTO(
+    $donneesClient['prix_final'],
+    $donneesClient['reduction_appliquee']
+);
 
-$sousTotal = 0;
-foreach ($commandeDTO->getPanier() as $item) {
-    $sousTotal += $item['prix'] * $item['quantite'];
+$commande = new Commande(
+    $commandeDTO->getPrixFinal(),
+    $commandeDTO->isReductionAppliquee()
+);
+
+$database = new Database();
+$repository = new CommandeRepository($database);
+$succes = $repository->save($commande);
+
+if ($succes) {
+    echo "\n=======================================================\n";
+    echo "            COMMANDE ENREGISTRÉE AVEC SUCCÈS           \n";
+    echo "=======================================================\n";
+    echo sprintf(" Commande N°         : #%d\n", $commande->getId());
+    echo sprintf(" Date de création    : %s\n", $commande->getDateCreation()?->format('d/m/Y H:i:s') ?? 'N/A');
+    echo sprintf(" Prix final          : %10.2f FCFA\n", $commande->getPrixFinal());
+    echo sprintf(" Réduction appliquée : %s\n", $commande->isReductionAppliquee() ? 'OUI' : 'NON');
+    echo "=======================================================\n\n";
+} else {
+    echo "\n[Erreur] Impossible d'enregistrer la commande.\n\n";
 }
-
-$tauxReduction = 0.0;
-if ($commandeDTO->getCodePromo() === 'REDUC10') {
-    $tauxReduction = 0.10;
-}
-$remise = $sousTotal * $tauxReduction;
-$prixFinal = $sousTotal - $remise;
-$reductionAppliquee = ($tauxReduction > 0);
-
-$commande = new Commande($prixFinal, $reductionAppliquee);
-$repository = new CommandeRepository();
-$repository->save($commande);
-
-echo "\n                      DÉTAILS COMMANDE                        \n\n";
-echo sprintf(" Commande N°         : #%d\n", $commande->getId() ?? 0);
-echo sprintf(" Date de création    : %s\n", $commande->getDateCreation()?->format('d/m/Y H:i:s') ?? 'N/A');
-echo sprintf(" Code promo          : %s\n", $commandeDTO->getCodePromo() ?? 'Aucun');
-echo sprintf(" Réduction appliquée : %s\n", $commande->isReductionAppliquee() ? 'OUI (' . ($tauxReduction * 100) . '%)' : 'NON');
-echo "\n                      CONTENU DU PANIER                       \n\n";
-echo sprintf(" %-24s | %-12s | %-8s | %-10s\n", "Article", "Prix unit.", "Quantité", "Sous-total");
-
-foreach ($commandeDTO->getPanier() as $item) {
-    $totalLigne = $item['prix'] * $item['quantite'];
-    echo sprintf(
-        " %-24s | %10.2f fcfa | %8d | %8.2f fcfa\n",
-        $item['nom'],
-        $item['prix'],
-        $item['quantite'],
-        $totalLigne
-    );
-}
-
-echo sprintf(" Sous-total brut     : %10.2f fcfa\n", $sousTotal);
-if ($reductionAppliquee) {
-    echo sprintf(" Remise appliquée    : -%9.2f fcfa\n", $remise);
-}
-echo sprintf(" TOTAL FINAL À PAYER : %10.2f fcfa\n", $commande->getPrixFinal());
-
