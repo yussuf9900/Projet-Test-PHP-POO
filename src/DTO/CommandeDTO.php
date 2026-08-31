@@ -1,25 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DTO;
 
 readonly class CommandeDTO
 {
-    private float $prixFinal;
-    private bool $reductionAppliquee;
-
-    public function __construct(float $prixFinal, bool $reductionAppliquee = false)
-    {
-        $this->prixFinal = $prixFinal;
-        $this->reductionAppliquee = $reductionAppliquee;
+    public function __construct(
+        private float $montantInitial,
+        private ?string $codePromo = null
+    ) {
     }
 
-    public function getPrixFinal(): float
+    public function getMontantInitial(): float
     {
-        return $this->prixFinal;
+        return $this->montantInitial;
     }
 
-    public function isReductionAppliquee(): bool
+    public function getCodePromo(): ?string
     {
-        return $this->reductionAppliquee;
+        return $this->codePromo;
     }
 }
