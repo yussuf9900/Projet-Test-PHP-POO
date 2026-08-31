@@ -7,8 +7,6 @@ namespace App\Service;
 use App\DTO\CommandeDTO;
 use App\Entity\Commande;
 use App\Repository\CommandeRepository;
-use InvalidArgumentException;
-use RuntimeException;
 
 class CommandeService
 {
@@ -27,7 +25,7 @@ class CommandeService
         $montantInitial = $dto->getMontantInitial();
 
         if ($montantInitial <= 0) {
-            throw new InvalidArgumentException("Le montant de la commande doit être supérieur à 0.");
+            throw new \InvalidArgumentException("Le montant de la commande doit être supérieur à 0.");
         }
 
         $reductionAppliquee = $this->verifierCodePromo($dto->getCodePromo());
@@ -42,7 +40,7 @@ class CommandeService
         $succes = $this->repository->save($commande);
 
         if (!$succes) {
-            throw new RuntimeException("Erreur lors de l'enregistrement de la commande en BDD.");
+            throw new \RuntimeException("Erreur lors de l'enregistrement de la commande en BDD.");
         }
 
         return $commande;
